@@ -1,0 +1,4 @@
+# sensor calibration offsets, value is added to corrected reading
+#
+# usage:
+# 28_XXXXXXXX=-0.2

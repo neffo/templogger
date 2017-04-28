@@ -1,0 +1,5 @@
+# sensible sensors names go here
+#
+# usage:
+# 28_XXXXXXXXXXX=Fridge
+# 28_XXXXXXXXXXX=Garage
