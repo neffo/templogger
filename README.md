@@ -14,8 +14,12 @@ Install:
 - create public_html folder in /home/pi
 - enable mod userdir in apache2
 - Run:
+~~~~
 cd ~/public_html
 git clone git@github.com:neffo/templogger.git
+~~~~
 - add php /home/pi/public_html/templogger/main.php to crontab (at least
 every 5 minutes)
-
+~~~~
+* * * * * php /home/pi/public_html/templogger/main.php
+~~~~
