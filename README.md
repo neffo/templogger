@@ -23,4 +23,8 @@ every 5 minutes)
 ~~~~
 * * * * * php /home/pi/public_html/templogger/main.php
 ~~~~
-sssssssssssssssssssssd
+
+## Screenshot
+
+![Screenshot](/screenshot/beertemps.png)
+
