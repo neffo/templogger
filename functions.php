@@ -1,7 +1,8 @@
 <?php
 
 define("SYS_BUS_LOCATION","/sys/bus/w1/devices/"); // location of sensors data bus
-define("DATA_DIR","data/"); // where we save rrd files, and where sensor config lives
+define("DATA_DIR","/home/pi/public_html/templogger/data/"); // where we save rrd files, and where sensor config lives
+define("BASE_DIR","/home/pi/public_html/templogger/"); // where we save rrd files, and where sensor config lives
 
 
 function pushbullet_notify($title = "test", $body = "test", $target = PUSHBULLET_TARGETS) {
@@ -35,8 +36,8 @@ function create_rrd_database($sensor) {
 		"--step", "300",            // Use a step-size of 5 minutes
 		"DS:temp:GAUGE:600:U:U", // raw sensor temperature
 		"DS:ctemp:GAUGE:600:U:U", // with offset applied (if there is one)
-		"RRA:AVERAGE:0.5:1:288",
-		"RRA:AVERAGE:0.5:12:2016", // one hour for 12 weeks
+		"RRA:AVERAGE:0.5:1:24192", // 12 weeks
+		"RRA:AVERAGE:0.5:12:8760", // per hour for a year 1 year
 		);
 	$filename = DATA_DIR.$sensor.".rrd";
 	$ok = rrd_create ( $filename, $options );
@@ -75,8 +76,11 @@ function update_all_sensors ( ) {
 			while (($file = readdir($dh)) !== false) {
 				if ( substr ( $file , 0, 2) == "28" ) { // 28_* is a temp sensor
 					$temp = read_sensor($dir.$file);
-					if ($temp !== false ) {
+					if ($temp !== false && is_numeric($temp) ) {
 						update_rrd_database($file, $temp);
+					}
+					else {
+						echo "No temp data returned ($temp)\n";
 					}
 				}
 			}
@@ -111,19 +115,47 @@ function read_sensor($sensor) {
 	}
 }
 
-function create_graph($file, $title) {
-  $options = array(
-    "--title=$title",
-    "--vertical-label=Temp",
-    "DEF:temp=$file:temp:AVERAGE",
-    "CDEF:ttemp=temp,1,*",
-    "AREA:ttemp#00FF00:Temperature",
-  );
+function create_graph($files, $names, $title = "Temperature Data") {
+	$colours = array(
+		"#FF0000", // Red
+		"#0000FF", // Blue
+  	 	"#BBBB00", // Yellow
+  	 	"#00FFFF", // Cyan / Aqua
+  	 	"#C0C0C0", // Silver
+  	 	"#808080", // Gray
+  	 	"#800080", // Purple
+  	 	"#000080", // Navy
+  	 	"#00FF00", // Green
+  	 	"#000000", // Black
+	);
+	//print_r($colours);
+	$options = array(
+		"--start=end-1d",
+		"--title=$title",
+		"--vertical-label=Degrees Celsius",
+		"--width=700", "--height=500",
+		"--imgformat=SVG",
+		"--lower-limit=-20",
+		"--upper-limit=30",
+		"--step=60",
+		"--slope-mode",
+		"--right-axis=1:0",
+		"--right-axis-label=Degrees Celsius",
+		
+	);
+	$i = 0;
+	foreach($files as $file) {
+		// add to list
+		$options[] = "DEF:temp$i=$file:temp:AVERAGE";
+		$options[] = "CDEF:ttemp$i=temp$i,1,*";
+		$options[] = "LINE1:ttemp$i".$colours[$i%count($colours)].":".$names[$i]; //." [#".($i+1)."]"; // note that we reuse colours
+		$i++;
+	}
 
-  $ret = rrd_graph("temp.png", $options);
-  if (! $ret) {
-    echo "<b>Graph error: </b>".rrd_error()."\n";
-  }
+	$ret = rrd_graph(BASE_DIR."temp.svg", $options);
+	if (! $ret) {
+		echo "<b>Graph error: </b>".rrd_error()."\n";
+	}
 }
 
 
