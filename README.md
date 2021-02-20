@@ -11,10 +11,14 @@ Requirements:
 - RRDtool
 
 Install:
-- create public_html folder in /home/pi
+- create public_html folder in /home/pi or your own user directory
 - enable mod userdir in apache2
 - Run:
 ~~~~
+sudo apt install git apache2 libapache2-mod-php php-cli rrdtool php-rrd
+mkdir ~/public_html
+sudo a2enmod userdir
+sudo apachectl restart
 cd ~/public_html
 git clone git@github.com:neffo/templogger.git
 ~~~~

@@ -7,7 +7,7 @@ define("BASE_DIR","/home/pi/public_html/templogger/"); // where we save rrd file
 
 function pushbullet_notify($title = "test", $body = "test", $target = PUSHBULLET_TARGETS) {
 	// mostly borrowed from "pushnotify" bash script (of which the most important bit is here:
-	// echo $DATA | curl -u tXsHRjiFERdKbpvjBb1BCoLOTaG4J7lX: -X POST https://api.pushbullet.com/v2/pushes --header 'Content-Type: application/json' --data-binary @-
+	// echo $DATA | curl -u $APIKEY: -X POST https://api.pushbullet.com/v2/pushes --header 'Content-Type: application/json' --data-binary @-
 
 	$type = "note";
 	$source_iden = PUSHBULLET_SOURCE;
